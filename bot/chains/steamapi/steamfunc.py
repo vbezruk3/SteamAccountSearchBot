@@ -88,6 +88,13 @@ def getCost(url):
     time.sleep(sleep_time1)
 
     try:
+        element = driver.find_element_by_class_name("error_ctn")
+
+        return 'error'
+    except:
+        pass
+
+    try:
         element = driver.find_element_by_id("invValue")
     except:
         return 'none'

@@ -10,15 +10,27 @@ extension_dir = './../extensions/Steam-Inventory-Helper.crx'
 
 countries_dir = './../data/countries.json'
 
+queue_dir = './../data/queue.json'
+
+chats_id_dir = './../data/chats_id.json'
+
 options = webdriver.ChromeOptions()
 
 prefs = {"profile.managed_default_content_settings.images": 2}
+
 options.add_experimental_option("prefs", prefs)
 
 options.add_extension(extension_dir)
+
 options.add_argument("disable-popup-blocking")
+
 options.add_argument("disable-infobars")
 
+queue_sleep = 30
+
+error_sleep = 120
+
 sleep_time1 = 1
+
 sleep_time2 = 3
 
