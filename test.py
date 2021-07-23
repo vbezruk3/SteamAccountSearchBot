@@ -21,6 +21,8 @@ def init():
     options.add_experimental_option("prefs", prefs)
 
     options.add_extension('./Steam-Inventory-Helper_v1.17.70.crx')
+    options.add_argument("disable-popup-blocking")
+    options.add_argument("disable-infobars")
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 
 def getId(url):
