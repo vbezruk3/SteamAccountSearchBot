@@ -20,7 +20,7 @@ def init():
     prefs = {"profile.managed_default_content_settings.images": 2}
     options.add_experimental_option("prefs", prefs)
 
-    options.add_extension('./Steam-Inventory-Helper_v1.17.70.crx')
+    options.add_extension('./../extensions/Steam-Inventory-Helper.crx')
     options.add_argument("disable-popup-blocking")
     options.add_argument("disable-infobars")
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
@@ -114,13 +114,13 @@ def getAll(url):
 
     return inf
 
-init()
+#init()
 
-print(getAll('https://steamcommunity.com/id/VladSukr'))
+#print(getAll('https://steamcommunity.com/id/VladSukr'))
 
-time.sleep(2)
+#time.sleep(2)
 
-print(getAll('https://steamcommunity.com/id/aveAMERICA'))
+#print(getAll('https://steamcommunity.com/id/aveAMERICA'))
 
 
 
