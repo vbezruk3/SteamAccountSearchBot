@@ -12,18 +12,16 @@ import requests
 
 from webdriver_manager.chrome import ChromeDriverManager
 
+from bot.config import *
+
+import bot.chains.func.files as files
+
 def init():
-    global driver
+    global driver, countries
 
-    options = webdriver.ChromeOptions()
-
-    prefs = {"profile.managed_default_content_settings.images": 2}
-    options.add_experimental_option("prefs", prefs)
-
-    options.add_extension('./../extensions/Steam-Inventory-Helper.crx')
-    options.add_argument("disable-popup-blocking")
-    options.add_argument("disable-infobars")
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
+    countries = files.loadFile(countries_dir)
 
 def getId(url):
     url = f'{url}/?xml=1'
@@ -45,8 +43,6 @@ def getInf(id):
 
     tables = str(soup.find_all('ul', {'class': 'player-info'}))
 
-    #print(tables)
-
     lk = tables.find('Level <span>')
     k = 0
 
@@ -57,8 +53,6 @@ def getInf(id):
 
         k += 1
 
-    #print(level)
-
     rk = tables.find('"number" title="">')
     k = 0
 
@@ -68,8 +62,6 @@ def getInf(id):
         rank += tables[rk + 18 + k]
 
         k += 1
-
-    #print(rank)
 
     ck = tables.find('flag-icon-') + 10
 
@@ -82,7 +74,8 @@ def getInf(id):
 
         k += 1
 
-    #print(country)
+    if country not in countries:
+        country = 'none'
 
     return [level, rank, country]
 
@@ -92,13 +85,16 @@ def getCost(url):
 
     driver.get(url)
 
-    time.sleep(1)
+    time.sleep(sleep_time1)
 
-    element = driver.find_element_by_id("invValue")
+    try:
+        element = driver.find_element_by_id("invValue")
+    except:
+        return 'none'
 
     element.click()
 
-    time.sleep(3)
+    time.sleep(sleep_time2)
 
     soup = BeautifulSoup(driver.page_source)
     tables = str(soup.find_all('span', {'class': 'priceValue'})[1])[26:].replace('</span>', '')
@@ -113,14 +109,6 @@ def getAll(url):
     inf.append(cost)
 
     return inf
-
-#init()
-
-#print(getAll('https://steamcommunity.com/id/VladSukr'))
-
-#time.sleep(2)
-
-#print(getAll('https://steamcommunity.com/id/aveAMERICA'))
 
 
 
