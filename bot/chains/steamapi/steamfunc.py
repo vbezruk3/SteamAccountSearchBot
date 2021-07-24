@@ -106,7 +106,7 @@ def getCost(url):
     soup = BeautifulSoup(driver.page_source)
     tables = str(soup.find_all('span', {'class': 'priceValue'})[1])[26:].replace('</span>', '')
 
-    tables = round(float(tables.replace(',', '')))
+    tables = float(tables.replace(',', ''))
 
     return tables
 

@@ -14,6 +14,8 @@ queue_dir = './../data/queue.json'
 
 chats_id_dir = './../data/chats_id.json'
 
+settings_dir = './../data/sort_settings.json'
+
 options = webdriver.ChromeOptions()
 
 prefs = {"profile.managed_default_content_settings.images": 2}
@@ -33,11 +35,5 @@ error_sleep = 120
 sleep_time1 = 1
 
 sleep_time2 = 3
-
-cost_mistake = 0.1
-
-level_mistake = 0.1
-
-rank_mistake = 0.1
 
 

@@ -1,17 +1,1 @@
-{
-  "671836800": {
-    "level": {
-      "intrv": [1, 10],
-      "incl": [true, true]
-    },
-    "cost": {
-      "intrv": [1, 10],
-      "incl": [true, true]
-    },
-    "rank": {
-      "intrv": [1, 10],
-      "incl": [true, true]
-    },
-    "county": ["ua", "ru"]
-    }
-}
+{"default": {"level": {"intrv": [1, 10], "incl": ["True", "True"], "mist": 0.1}, "cost": {"intrv": [1, 10], "incl": ["True", "True"], "mist": 0.1}, "rank": {"intrv": [1, 10], "incl": ["True", "True"], "mist": 0.1}, "country": ["az", "by", "am", "kz", "kg", "md", "pl", "ru", "tj", "uz", "tm", "mn", "af", "ge", "ua"]}}
