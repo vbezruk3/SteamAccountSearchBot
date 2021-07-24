@@ -23,6 +23,33 @@ def init():
 
     countries = files.loadFile(countries_dir)
 
+def getSteam(url):
+    driver.get(url)
+
+    time.sleep(forcedrop_time)
+
+    soup = BeautifulSoup(driver.page_source, features="html.parser")
+
+    try:
+        element = driver.find_element_by_class_name("profile-main__steam")
+    except:
+        return None
+
+    tables = str(soup.find_all('a', {'class': 'profile-main__steam'}))
+
+    url = ''
+
+    k = 0
+
+    i = tables.find('href="') + 6
+
+    while tables[k + i] != '"':
+        url += tables[k + i]
+
+        k += 1
+
+    return url
+
 def getId(url):
     url = f'{url}/?xml=1'
 
@@ -103,7 +130,7 @@ def getCost(url):
 
     time.sleep(sleep_time2)
 
-    soup = BeautifulSoup(driver.page_source)
+    soup = BeautifulSoup(driver.page_source, features="html.parser")
     tables = str(soup.find_all('span', {'class': 'priceValue'})[1])[26:].replace('</span>', '')
 
     tables = float(tables.replace(',', ''))

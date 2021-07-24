@@ -34,9 +34,4 @@ async def check():
 
             c = queuefunc.check_sort(chat_id, data)
 
-            if c == True:
-                c = 'Ok!'
-            else:
-                c = 'No('
-
             await bot.send_message(chat_id=chat_id, text=f'url = {url} cost = {data[3]}, level = {data[0]}, country = {data[2]}, years = {data[1]}, check = {c}')
