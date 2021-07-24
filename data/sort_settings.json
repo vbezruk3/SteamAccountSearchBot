@@ -1,0 +1,17 @@
+{
+  "671836800": {
+    "level": {
+      "intrv": [1, 10],
+      "incl": [true, true]
+    },
+    "cost": {
+      "intrv": [1, 10],
+      "incl": [true, true]
+    },
+    "rank": {
+      "intrv": [1, 10],
+      "incl": [true, true]
+    },
+    "county": ["ua", "ru"]
+    }
+}

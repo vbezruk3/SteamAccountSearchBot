@@ -58,7 +58,7 @@ def getInf(id):
 
     rank = ''
 
-    while tables[rk + 18 + k] != '<':
+    while tables[rk + 18 + k] != 'y':
         rank += tables[rk + 18 + k]
 
         k += 1
@@ -105,6 +105,8 @@ def getCost(url):
 
     soup = BeautifulSoup(driver.page_source)
     tables = str(soup.find_all('span', {'class': 'priceValue'})[1])[26:].replace('</span>', '')
+
+    tables = round(float(tables.replace(',', '')))
 
     return tables
 

@@ -34,3 +34,10 @@ sleep_time1 = 1
 
 sleep_time2 = 3
 
+cost_mistake = 0.1
+
+level_mistake = 0.1
+
+rank_mistake = 0.1
+
+
