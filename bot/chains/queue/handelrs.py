@@ -26,7 +26,7 @@ async def check():
         data = steamfunc.getAll(url)
 
         if data[3] == 'error':
-            await bot.send_message(chat_id=chat_id, text='error, sleep')
+            await bot.send_message(chat_id=chat_id, text=f'Ошибка. Слишком частые запросы. Пауза на {error_sleep} с.')
 
             await asyncio.sleep(error_sleep)
         else:

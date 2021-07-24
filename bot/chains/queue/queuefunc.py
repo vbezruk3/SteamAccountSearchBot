@@ -8,53 +8,41 @@ chats_id = []
 
 settings = {}
 
+def isBetween(value, intrv, incl):
+    if (value > intrv[0] or (incl[0] and value == intrv[0])) and (value < intrv[1] or (incl[1] and value == intrv[1])):
+        return True
+    return False
+
 def check_sort(chat_id, data):
     setting = settings['default']
 
-    setting["level"]["intrv"][0] -= setting["level"]["intrv"][0] * setting["level"]["mist"]
+    level_intrvl = [float(setting["level"]["intrv"][0] - setting["level"]["intrv"][0] * setting["level"]["mist"]), float(setting["level"]["intrv"][1] + setting["level"]["intrv"][1] * setting["level"]["mist"])]
 
-    setting["level"]["intrv"][0] = float(setting["level"]["intrv"][0])
+    cost_intrvl = [float(setting["cost"]["intrv"][0] - setting["cost"]["intrv"][0] * setting["cost"]["mist"]), float(setting["cost"]["intrv"][1] + setting["cost"]["intrv"][1] * setting["cost"]["mist"])]
 
-    setting["cost"]["intrv"][0] -= setting["cost"]["intrv"][0] * setting["cost"]["mist"]
-
-    setting["cost"]["intrv"][0] = float(setting["cost"]["intrv"][0])
-
-    setting["rank"]["intrv"][0] -= setting["rank"]["intrv"][0] * setting["rank"]["mist"]
-
-    setting["rank"]["intrv"][0] = float(setting["rank"]["intrv"][0])
-
-
-    setting["level"]["intrv"][1] += setting["level"]["intrv"][1] * setting["level"]["mist"]
-
-    setting["level"]["intrv"][1] = float(setting["level"]["intrv"][1])
-
-    setting["cost"]["intrv"][1] += setting["cost"]["intrv"][1] * setting["cost"]["mist"]
-
-    setting["cost"]["intrv"][1] = float(setting["cost"]["intrv"][1])
-
-    setting["rank"]["intrv"][1] += setting["rank"]["intrv"][1] * setting["rank"]["mist"]
-
-    setting["rank"]["intrv"][1] = float(setting["rank"]["intrv"][1])
+    rank_intrvl = [float(setting["rank"]["intrv"][0] - setting["rank"]["intrv"][0] * setting["rank"]["mist"]), float(setting["rank"]["intrv"][1] + setting["rank"]["intrv"][1] * setting["rank"]["mist"])]
 
     level = float(data[0])
     rank = float(data[1])
     county = data[2]
-    cost = float(data[3])
+
+    if data[3] != 'none':
+        cost = float(data[3])
+    else:
+        cost = 'none'
 
     if not (county in setting["country"] or county == 'none'):
         return False
 
-    if not ((level > setting["level"]["intrv"][0] or (setting["level"]["incl"][0] and level == setting["level"]["intrv"][0])) and
-        (level < setting["level"]["intrv"][1] or (setting["level"]["incl"][1] and level == setting["level"]["intrv"][1]))):
+    if not isBetween(level, level_intrvl, setting["level"]["incl"]):
         return False
 
-    if not ((rank > setting["rank"]["intrv"][0] or (setting["rank"]["incl"][0] and rank == setting["rank"]["intrv"][0])) and
-        (rank < setting["rank"]["intrv"][1] or (setting["rank"]["incl"][1] and rank == setting["rank"]["intrv"][1]))):
+    if not isBetween(rank, rank_intrvl, setting["rank"]["incl"]):
         return False
 
-    if not ((cost == 'none' or cost > setting["cost"]["intrv"][0] or (setting["cost"]["incl"][0] and cost == setting["cost"]["intrv"][0])) and
-        (cost < setting["cost"]["intrv"][1] or (setting["cost"]["incl"][1] and cost == setting["cost"]["intrv"][1]))):
-        return False
+    if cost != 'none':
+        if not isBetween(cost, cost_intrvl, setting["cost"]["incl"]):
+            return False
 
     return True
 
