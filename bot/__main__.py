@@ -20,4 +20,6 @@ if __name__ == '__main__':
 
     queuefunc.load()
 
+    #print(queuefunc.getLink())
+
     main()

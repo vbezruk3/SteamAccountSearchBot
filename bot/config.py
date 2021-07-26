@@ -16,6 +16,8 @@ chats_id_dir = './../data/chats_id.json'
 
 settings_dir = './../data/sort_settings.json'
 
+results_dir = './../data/results.json'
+
 options = webdriver.ChromeOptions()
 
 prefs = {"profile.managed_default_content_settings.images": 2}
@@ -28,9 +30,9 @@ options.add_argument("disable-popup-blocking")
 
 options.add_argument("disable-infobars")
 
-queue_sleep = 20
+queue_sleep = 45
 
-error_sleep = 120
+error_sleep = 90
 
 sleep_time1 = 1
 

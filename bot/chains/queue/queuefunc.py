@@ -2,19 +2,27 @@ import bot.chains.func.files as files
 
 from bot.config import *
 
-queue = []
+import re
+
+import bot.chains.steamapi.steamfunc as steamfunc
+
+from bot.__main__ import bot
+
+queue = {}
 
 chats_id = []
 
 settings = {}
 
+results = {}
+
 def isBetween(value, intrv, incl):
-    if (value > intrv[0] or (incl[0] and value == intrv[0])) and (value < intrv[1] or (incl[1] and value == intrv[1])):
+    if (value > intrv[0] or (incl[0] == 'True' and value == intrv[0])) and (value < intrv[1] or (incl[1] == 'True'and value == intrv[1])):
         return True
     return False
 
 def check_sort(chat_id, data):
-    setting = settings['default']
+    setting = settings[str(chat_id)]
 
     level_intrvl = [float(setting["level"]["intrv"][0] - setting["level"]["intrv"][0] * setting["level"]["mist"]), float(setting["level"]["intrv"][1] + setting["level"]["intrv"][1] * setting["level"]["mist"])]
 
@@ -26,10 +34,14 @@ def check_sort(chat_id, data):
     rank = float(data[1])
     county = data[2]
 
-    if data[3] != 'none':
-        cost = float(data[3])
-    else:
-        cost = 'none'
+    if data[3] == 'none':
+        return False
+
+    cost = data[3]
+
+    print(cost)
+
+    print(cost_intrvl)
 
     if not (county in setting["country"] or county == 'none'):
         return False
@@ -40,14 +52,13 @@ def check_sort(chat_id, data):
     if not isBetween(rank, rank_intrvl, setting["rank"]["incl"]):
         return False
 
-    if cost != 'none':
-        if not isBetween(cost, cost_intrvl, setting["cost"]["incl"]):
-            return False
+    if not isBetween(cost, cost_intrvl, setting["cost"]["incl"]):
+        return False
 
     return True
 
 def load():
-    global queue, chats_id, settings
+    global queue, chats_id, settings, results
 
     queue = files.loadFile(queue_dir)
 
@@ -55,14 +66,17 @@ def load():
 
     settings = files.loadFile(settings_dir)
 
+    results = files.loadFile(results_dir)
+
 def getLink():
-    if not queue:
+    if not queue["steam"]:
         return None
 
-    return [queue[0], chats_id[0]]
+    return [queue["steam"][0], queue["forcedrop"][0], str(chats_id[0])]
 
 def removeLink():
-    queue.pop(0)
+    queue["steam"].pop(0)
+    queue["forcedrop"].pop(0)
 
     chats_id.pop(0)
 
@@ -70,8 +84,10 @@ def removeLink():
 
     return
 
-def addLink(url, chat_id):
-    queue.append(url)
+def addLink(url, link, chat_id):
+
+    queue['steam'].append(url)
+    queue['forcedrop'].append(link)
 
     chats_id.append(chat_id)
 
@@ -79,9 +95,228 @@ def addLink(url, chat_id):
 
     return
 
+def checkUser(chat_id):
+    if str(chat_id) not in settings.keys():
+        return False
+    return True
+
+def addUser(chat_id):
+    setting = settings['default']
+
+    settings[str(chat_id)] = setting
+
+    results[str(chat_id)] = []
+
+    save()
+
+def getParams(param):
+    nums = re.findall(r'\d+', param)
+
+    nums = [int(i) for i in nums]
+
+    return nums
+
+def changeSettings(chat_id, param):
+
+    if 'цена инвентаря ' in param:
+        param = param.replace('цена инвентаря ', '')
+
+        nums = getParams(param)
+
+        settings[str(chat_id)]['cost']['intrv'][0] = nums[0]
+        settings[str(chat_id)]['cost']['intrv'][1] = nums[1]
+        settings[str(chat_id)]['cost']["mist"] = float(nums[2] / 100)
+
+        if '[' in param:
+            settings[str(chat_id)]['cost']["incl"][0] = 'True'
+        else:
+            settings[str(chat_id)]['cost']["incl"][0] = 'False'
+
+        if ']' in param:
+            settings[str(chat_id)]['cost']["incl"][1] = 'True'
+        else:
+            settings[str(chat_id)]['cost']["incl"][1] = 'False'
+
+        save()
+
+        return 'Цена инвентаря изменена'
+
+    if 'уровень ' in param:
+        param = param.replace('уровень ', '')
+
+        nums = getParams(param)
+
+        settings[str(chat_id)]['level']['intrv'][0] = nums[0]
+        settings[str(chat_id)]['level']['intrv'][1] = nums[1]
+        settings[str(chat_id)]['level']["mist"] = float(nums[2] / 100)
+
+        if '[' in param:
+            settings[str(chat_id)]['level']["incl"][0] = 'True'
+        else:
+            settings[str(chat_id)]['level']["incl"][0] = 'False'
+
+        if ']' in param:
+            settings[str(chat_id)]['level']["incl"][1] = 'True'
+        else:
+            settings[str(chat_id)]['level']["incl"][1] = 'False'
+
+        save()
+
+        return 'Уровень изменен'
+
+    if 'лет выслуги ' in param:
+        param = param.replace('лет выслуги ', '')
+
+        nums = getParams(param)
+
+        settings[str(chat_id)]['rank']['intrv'][0] = nums[0]
+        settings[str(chat_id)]['rank']['intrv'][1] = nums[1]
+        settings[str(chat_id)]['rank']["mist"] = float(nums[2] / 100)
+
+        if '[' in param:
+            settings[str(chat_id)]['rank']["incl"][0] = 'True'
+        else:
+            settings[str(chat_id)]['rank']["incl"][0] = 'False'
+
+        if ']' in param:
+            settings[str(chat_id)]['rank']["incl"][1] = 'True'
+        else:
+            settings[str(chat_id)]['rank']["incl"][1] = 'False'
+
+        save()
+
+        return 'Лет выслуги изменено'
+
+    if 'регионы ' in param:
+        param = param.replace('регионы ', '')
+
+        if 'добавить ' in param:
+            param = param.replace('добавить ', '')
+
+            if param not in steamfunc.countries:
+                return 'Нет такого региона'
+
+            settings[str(chat_id)]['country'].append(param)
+
+            save()
+
+            return 'Регион добавлен'
+
+        if 'удалить ' in param:
+            param = param.replace('удалить ', '')
+
+            if param not in settings[str(chat_id)]['country']:
+                return 'Такой регион не добавлен у вас'
+
+            settings[str(chat_id)]['country'].remove(param)
+
+            save()
+
+            return 'Регион удален'
+
+    return 'Ошибка'
+
+async def sendResult(chat_id):
+    count = len(results[str(chat_id)])
+
+    if count == 0:
+        await bot.send_message(chat_id=chat_id, text=f'Нету найденых аккаунтов')
+
+        return
+
+    f = open('result.txt', 'w')
+
+    ans = f'Найдено {count} аккаунтов:\n'
+
+    for result in results[str(chat_id)]:
+        ans += result + '\n'
+
+    results[str(chat_id)] = []
+
+    save()
+
+    f.write(ans)
+
+    f.close()
+
+    await bot.send_document(chat_id=chat_id, document=open('result.txt', 'rb'))
+
+def addResult(chat_id, result, steam_url, forcedrop_url):
+
+    res = str(result[0]) + ' ' + str(result[1]) + ' ' + str(result[2]) + ' ' + str(result[3]) + ' ' + steam_url + ' ' + forcedrop_url
+
+    res = f'Steam: {steam_url}, Forcedrop: {forcedrop_url}, цена инвентаря: {round(float(result[3]))}$, уровень: {result[0]}, лет выслуги: {result[1]}, регион: {result[2]}'
+
+    results[str(chat_id)].append(res)
+
+    save()
+
+def getSettings(chat_id):
+    setting = settings[str(chat_id)]
+
+    ans = 'Ваши настройки отбора:\n'
+
+    ans += '\t -цена инвентаря: '
+
+    if setting["cost"]["incl"][0] == 'True':
+        ans += '['
+    else:
+        ans += '('
+
+    ans += f'{setting["cost"]["intrv"][0]}; {setting["cost"]["intrv"][1]}'
+
+    if setting["cost"]["incl"][1] == 'True':
+        ans += ']'
+    else:
+        ans += ')'
+
+    ans += f' +- {float(setting["cost"]["mist"]) * 100}%\n'
+
+    #
+
+    ans += '\t -уровень: '
+
+    if setting["level"]["incl"][0] == 'True':
+        ans += '['
+    else:
+        ans += '('
+
+    ans += f'{setting["level"]["intrv"][0]}; {setting["level"]["intrv"][1]}'
+
+    if setting["level"]["incl"][1] == 'True':
+        ans += ']'
+    else:
+        ans += ')'
+
+    ans += f' +- {float(setting["level"]["mist"]) * 100}%\n'
+
+    #
+
+    ans += '\t -лет выслуги: '
+
+    if setting["rank"]["incl"][0] == 'True':
+        ans += '['
+    else:
+        ans += '('
+
+    ans += f'{setting["rank"]["intrv"][0]}; {setting["rank"]["intrv"][1]}'
+
+    if setting["rank"]["incl"][1] == 'True':
+        ans += ']'
+    else:
+        ans += ')'
+
+    ans += f' +- {float(setting["rank"]["mist"]) * 100}%\n'
+
+    ans += f'\t -регионы: {setting["country"]}'
+
+    return ans
+
 def save():
     files.saveFile(queue, queue_dir)
 
     files.saveFile(chats_id, chats_id_dir)
 
     files.saveFile(settings, settings_dir)
+
+    files.saveFile(results, results_dir)

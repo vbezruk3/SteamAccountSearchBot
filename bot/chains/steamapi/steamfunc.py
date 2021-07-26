@@ -16,22 +16,26 @@ from bot.config import *
 
 import bot.chains.func.files as files
 
+countries = []
+
 def init():
-    global driver, countries
+    global driver, countries, driverforce
 
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
+    driverforce = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 
     countries = files.loadFile(countries_dir)
 
 def getSteam(url):
-    driver.get(url)
+    driverforce.get(url)
 
     time.sleep(forcedrop_time)
 
-    soup = BeautifulSoup(driver.page_source, features="html.parser")
+    soup = BeautifulSoup(driverforce.page_source, features="html.parser")
 
     try:
-        element = driver.find_element_by_class_name("profile-main__steam")
+        element = driverforce.find_element_by_class_name("profile-main__steam")
     except:
         return None
 
