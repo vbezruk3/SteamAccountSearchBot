@@ -28,7 +28,7 @@ async def check():
 
         chat_id = link[2]
 
-        data = steamfunc.getAll(url)
+        data = await steamfunc.getAll(url)
 
         if data[3] == 'error':
             await bot.send_message(chat_id=chat_id, text=f'Ошибка. Слишком частые запросы. Пауза на {error_sleep} с.')
@@ -37,9 +37,25 @@ async def check():
         else:
             queuefunc.removeLink()
 
+            await bot.send_message(chat_id=chat_id, text=f'Проверка профиля ...')
+
+            await bot.send_message(chat_id=chat_id, text=f"Осталось {len(queuefunc.queue['steam'])}")
+
             c = queuefunc.check_sort(chat_id, data)
+
+            if data[3] == 'none':
+                cost = 'none'
+            else:
+                cost = round(float(data[3]))
+
+            ans = f'Информация: цена инвентаря: {cost}$, уровень: {data[0]}, лет выслуги: {data[1]}, регион: {data[2]}'
+
+            if c == False:
+                ans += ' Не подходит('
+            else:
+                ans += ' Подходит!'
+
+            await bot.send_message(chat_id=chat_id, text=ans)
 
             if c == True:
                 queuefunc.addResult(chat_id, data, url, forcedrop_link)
-
-                await bot.send_message(chat_id=chat_id, text=f'Найден профиль!')

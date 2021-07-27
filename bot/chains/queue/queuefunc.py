@@ -226,7 +226,7 @@ async def sendResult(chat_id):
 
     f = open('result.txt', 'w')
 
-    ans = f'Найдено {count} аккаунтов:\n'
+    ans = f'Naideno {count} accauntov:\n'
 
     for result in results[str(chat_id)]:
         ans += result + '\n'
@@ -243,9 +243,9 @@ async def sendResult(chat_id):
 
 def addResult(chat_id, result, steam_url, forcedrop_url):
 
-    res = str(result[0]) + ' ' + str(result[1]) + ' ' + str(result[2]) + ' ' + str(result[3]) + ' ' + steam_url + ' ' + forcedrop_url
+    #res = str(result[0]) + ' ' + str(result[1]) + ' ' + str(result[2]) + ' ' + str(result[3]) + ' ' + steam_url + ' ' + forcedrop_url
 
-    res = f'Steam: {steam_url}, Forcedrop: {forcedrop_url}, цена инвентаря: {round(float(result[3]))}$, уровень: {result[0]}, лет выслуги: {result[1]}, регион: {result[2]}'
+    res = f'Steam: {steam_url}, Forcedrop: {forcedrop_url}, cena inventarya: {round(float(result[3]))}$, uroven: {result[0]}, let vislugi: {result[1]}, region: {result[2]}'
 
     results[str(chat_id)].append(res)
 

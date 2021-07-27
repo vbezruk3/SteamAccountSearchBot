@@ -19,42 +19,13 @@ import bot.chains.func.files as files
 countries = []
 
 def init():
-    global driver, countries, driverforce
+    global driver, countries
 
     driver = webdriver.Chrome(ChromeDriverManager().install(), options=options)
 
-    driverforce = webdriver.Chrome(ChromeDriverManager().install(), options=options)
-
     countries = files.loadFile(countries_dir)
 
-def getSteam(url):
-    driverforce.get(url)
-
-    time.sleep(forcedrop_time)
-
-    soup = BeautifulSoup(driverforce.page_source, features="html.parser")
-
-    try:
-        element = driverforce.find_element_by_class_name("profile-main__steam")
-    except:
-        return None
-
-    tables = str(soup.find_all('a', {'class': 'profile-main__steam'}))
-
-    url = ''
-
-    k = 0
-
-    i = tables.find('href="') + 6
-
-    while tables[k + i] != '"':
-        url += tables[k + i]
-
-        k += 1
-
-    return url
-
-def getId(url):
+async def getId(url):
     url = f'{url}/?xml=1'
 
     r = requests.get(url)
@@ -65,7 +36,7 @@ def getId(url):
 
     return tables
 
-def getInf(id):
+async def getInf(id):
     url = f'https://steamid.pro/lookup/{id}'
 
     r = requests.get(url)
@@ -89,10 +60,13 @@ def getInf(id):
 
     rank = ''
 
-    while tables[rk + 18 + k] != 'y':
+    while tables[rk + 18 + k] != 'y' and tables[rk + 18 + k] != 'm':
         rank += tables[rk + 18 + k]
 
         k += 1
+
+        if k > 10:
+            return [level, '0', 'none']
 
     ck = tables.find('flag-icon-') + 10
 
@@ -110,7 +84,7 @@ def getInf(id):
 
     return [level, rank, country]
 
-def getCost(url):
+async def getCost(url):
 
     url = f'{url}/inventory/#730'
 
@@ -130,26 +104,37 @@ def getCost(url):
     except:
         return 'none'
 
-    element.click()
+    tables = 'агрузка...'
 
-    time.sleep(sleep_time2)
+    k = 0
 
-    soup = BeautifulSoup(driver.page_source, features="html.parser")
-    tables = str(soup.find_all('span', {'class': 'priceValue'})[1])[26:].replace('</span>', '')
+    while tables == 'агрузка...':
 
-    tables = float(tables.replace(',', ''))
+        if k > 3:
+            return 'none'
+
+        k += 1
+
+        element.click()
+
+        time.sleep(sleep_time2)
+
+        soup = BeautifulSoup(driver.page_source, features="html.parser")
+        tables = str(soup.find_all('span', {'class': 'priceValue'})[0])[26:].replace('</span>', '')
+
+        tables = tables.replace(',', '')
+
+        time.sleep(0.5)
+
+    tables = float(tables)
 
     return tables
 
-def getAll(url):
-    cost = getCost(url)
-    id = getId(url)
-    inf = getInf(id)
+async def getAll(url):
+    cost = await getCost(url)
+    id = await getId(url)
+    inf = await getInf(id)
 
     inf.append(cost)
 
     return inf
-
-
-
-

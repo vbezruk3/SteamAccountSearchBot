@@ -6,7 +6,27 @@ from bot.__main__ import bot, dp, steamfunc
 
 import bot.chains.queue.queuefunc as queuefunc
 
+import time
+
+from selenium import webdriver
+
+from selenium.webdriver.chrome.options import Options
+
+import re
+
+from bs4 import BeautifulSoup
+
+import requests
+
+from webdriver_manager.chrome import ChromeDriverManager
+
+import bot.chains.func.files as files
+
 async def init(dp):
+    global driverforce
+
+    driverforce = webdriver.Chrome(ChromeDriverManager().install(), options=options)
+
     await bot.send_message(chat_id=ADMIN_ID, text = 'Bot started!')
 
 @dp.message_handler(commands=['результат'])
@@ -24,7 +44,7 @@ async def search(message: Message):
     answer = 'Команды:\n'
 
     answer += '/статус - сколько найдено аккаунтов\n'
-    answer += '/найстройки - Ваши настройки\n'
+    answer += '/настройки - Ваши настройки\n'
     answer += '/результат - получить файл с найденными аккаунтами, если они есть\n'
 
     await bot.send_message(chat_id=message.from_user.id, text=answer)
@@ -64,6 +84,33 @@ async def search(message: Message):
 
     await bot.send_message(chat_id=message.from_user.id, text=queuefunc.getSettings(message.chat.id))
 
+async def getSteam(url):
+    driverforce.get(url)
+
+    time.sleep(forcedrop_time)
+
+    soup = BeautifulSoup(driverforce.page_source, features="html.parser")
+
+    try:
+        element = driverforce.find_element_by_class_name("profile-main__steam")
+    except:
+        return None
+
+    tables = str(soup.find_all('a', {'class': 'profile-main__steam'}))
+
+    url = ''
+
+    k = 0
+
+    i = tables.find('href="') + 6
+
+    while tables[k + i] != '"':
+        url += tables[k + i]
+
+        k += 1
+
+    return url
+
 @dp.message_handler(content_types = ContentType.TEXT)
 async def search(message: Message):
 
@@ -75,9 +122,18 @@ async def search(message: Message):
     lines = []
     lines = message.text.split('\n')
 
+    count = len(lines)
+
+    i = 0
+
+    if 'forcedrop' in message.text:
+        await bot.send_message(chat_id=message.from_user.id, text='Профили добавляются')
+
     for link in lines:
-        if 'forcedrop.io/user/' in link:
-            url = steamfunc.getSteam(link)
+        if 'forcedrop' in link:
+            i += 1
+
+            url = await getSteam(link)
 
             if url != None:
 
@@ -85,8 +141,10 @@ async def search(message: Message):
                 flag = True
 
                 queuefunc.addLink(url, link, message.chat.id)
-    if flag:
+
+            if i % 10 == 0:
+                await bot.send_message(chat_id=message.from_user.id, text=f'Добавлено {i} из {count}')
+
+    if flag == True:
         await bot.send_message(chat_id=message.from_user.id, text='Профили добавлены')
-
-
 
