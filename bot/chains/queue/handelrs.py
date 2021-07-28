@@ -35,27 +35,40 @@ async def check():
 
             await asyncio.sleep(error_sleep)
         else:
-            queuefunc.removeLink()
+            if data[3] == 'error_load':
+                queuefunc.removeLink()
 
-            await bot.send_message(chat_id=chat_id, text=f'Проверка профиля ...')
+                queuefunc.addLink(url, forcedrop_link, chat_id)
 
-            await bot.send_message(chat_id=chat_id, text=f"Осталось {len(queuefunc.queue['steam'])}")
+                await bot.send_message(chat_id=chat_id, text=f'Инвентарь временно недоступен')
+                await bot.send_message(chat_id=ADMIN_ID, text=f'{chat_id}: Инвентарь временно недоступен')
 
-            c = queuefunc.check_sort(chat_id, data)
 
-            if data[3] == 'none':
-                cost = 'none'
             else:
-                cost = round(float(data[3]))
+                queuefunc.removeLink()
 
-            ans = f'Информация: цена инвентаря: {cost}$, уровень: {data[0]}, лет выслуги: {data[1]}, регион: {data[2]}'
+                await bot.send_message(chat_id=chat_id, text=f'Проверка профиля ...')
+                await bot.send_message(chat_id=ADMIN_ID, text=f'{chat_id}: Проверка профиля ...')
 
-            if c == False:
-                ans += ' Не подходит('
-            else:
-                ans += ' Подходит!'
+                await bot.send_message(chat_id=chat_id, text=f"Осталось {len(queuefunc.queue['steam'])}")
+                await bot.send_message(chat_id=ADMIN_ID, text=f'{chat_id}: Осталось {len(queuefunc.queue["steam"])}')
 
-            await bot.send_message(chat_id=chat_id, text=ans)
+                c = queuefunc.check_sort(chat_id, data)
 
-            if c == True:
-                queuefunc.addResult(chat_id, data, url, forcedrop_link)
+                if data[3] == 'none':
+                    cost = 'none'
+                else:
+                    cost = round(float(data[3]))
+
+                ans = f'Информация: цена инвентаря: {cost}$, уровень: {data[0]}, лет выслуги: {data[1]}, регион: {data[2]}'
+
+                if c == False:
+                    ans += ' Не подходит('
+                else:
+                    ans += ' Подходит!'
+
+                await bot.send_message(chat_id=chat_id, text=ans)
+                await bot.send_message(chat_id=ADMIN_ID, text=f'{chat_id}: {ans}')
+
+                if c == True:
+                    queuefunc.addResult(chat_id, data, url, forcedrop_link)

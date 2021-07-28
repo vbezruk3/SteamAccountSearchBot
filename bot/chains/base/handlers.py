@@ -127,7 +127,8 @@ async def search(message: Message):
     i = 0
 
     if 'forcedrop' in message.text:
-        await bot.send_message(chat_id=message.from_user.id, text='Профили добавляются')
+        await bot.send_message(chat_id=message.chat.id, text='Профили добавляются')
+        await bot.send_message(chat_id=ADMIN_ID, text=f'{message.chat.id}: Профили добавляются')
 
     for link in lines:
         if 'forcedrop' in link:
@@ -144,7 +145,9 @@ async def search(message: Message):
 
             if i % 10 == 0:
                 await bot.send_message(chat_id=message.from_user.id, text=f'Добавлено {i} из {count}')
+                await bot.send_message(chat_id=ADMIN_ID, text=f'{message.chat.id}: Добавлено {i} из {count}')
 
     if flag == True:
         await bot.send_message(chat_id=message.from_user.id, text='Профили добавлены')
+        await bot.send_message(chat_id=ADMIN_ID, text=f'{message.chat.id}: Профили добавлены')
 

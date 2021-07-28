@@ -30,12 +30,20 @@ def check_sort(chat_id, data):
 
     rank_intrvl = [float(setting["rank"]["intrv"][0] - setting["rank"]["intrv"][0] * setting["rank"]["mist"]), float(setting["rank"]["intrv"][1] + setting["rank"]["intrv"][1] * setting["rank"]["mist"])]
 
-    level = float(data[0])
-    rank = float(data[1])
+    if data[0] == 'none':
+        level = 'none'
+    else:
+        level = float(data[0])
+
     county = data[2]
 
     if data[3] == 'none':
         return False
+
+    if data[1] == 'none':
+        rank = 'none'
+    else:
+        rank = float(data[1])
 
     cost = data[3]
 
@@ -46,10 +54,10 @@ def check_sort(chat_id, data):
     if not (county in setting["country"] or county == 'none'):
         return False
 
-    if not isBetween(level, level_intrvl, setting["level"]["incl"]):
+    if not (level == 'none' or isBetween(level, level_intrvl, setting["level"]["incl"])):
         return False
 
-    if not isBetween(rank, rank_intrvl, setting["rank"]["incl"]):
+    if not (rank == 'none' or isBetween(rank, rank_intrvl, setting["rank"]["incl"])):
         return False
 
     if not isBetween(cost, cost_intrvl, setting["cost"]["incl"]):

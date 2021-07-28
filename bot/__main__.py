@@ -1,5 +1,7 @@
 from bot.core import *
 
+import time
+
 import bot.chains.steamapi.steamfunc as steamfunc
 
 import bot.chains.queue.handelrs as queue_handlers

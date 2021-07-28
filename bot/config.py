@@ -30,9 +30,9 @@ options.add_argument("disable-popup-blocking")
 
 options.add_argument("disable-infobars")
 
-queue_sleep = 60
+queue_sleep = 120
 
-error_sleep = 90
+error_sleep = 360
 
 sleep_time1 = 1
 

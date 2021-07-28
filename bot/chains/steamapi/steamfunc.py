@@ -50,10 +50,17 @@ async def getInf(id):
 
     level = ''
 
+    print(tables[lk:(lk+30)])
+
     while tables[lk + 12 + k] != '<':
         level += tables[lk + 12 + k]
 
         k += 1
+
+        if k > 3:
+            level = 'none'
+
+            break
 
     rk = tables.find('"number" title="">')
     k = 0
@@ -65,8 +72,10 @@ async def getInf(id):
 
         k += 1
 
-        if k > 10:
-            return [level, '0', 'none']
+        if k > 3:
+            rank = 'none'
+
+            break
 
     ck = tables.find('flag-icon-') + 10
 
@@ -86,6 +95,38 @@ async def getInf(id):
 
 async def getCost(url):
 
+    '''
+    url = f'https://csgobackpack.net/index.php?nick={id}'
+
+    driver.get(url)
+
+    time.sleep(1)
+
+    text = str(driver.page_source)
+
+    if 'In total' in text:
+
+        ans = text.find('In total') + 11
+
+        cost = ''
+
+        dollar = 1.18116
+
+        while text[ans] != ' ':
+            ans += 1
+
+            cost += text[ans]
+
+        if '€' in cost:
+            cost = float(cost.replace('€', '')) * dollar
+        else:
+            cost = float(cost.replace('$', ''))
+
+        return cost
+    else:
+        return 'none'
+    '''
+
     url = f'{url}/inventory/#730'
 
     driver.get(url)
@@ -96,6 +137,13 @@ async def getCost(url):
         element = driver.find_element_by_class_name("error_ctn")
 
         return 'error'
+    except:
+        pass
+
+    try:
+        element = driver.find_element_by_class_name("load_error_icon")
+
+        return 'error_load'
     except:
         pass
 
@@ -133,6 +181,7 @@ async def getCost(url):
 async def getAll(url):
     cost = await getCost(url)
     id = await getId(url)
+    #cost = await getCost(id)
     inf = await getInf(id)
 
     inf.append(cost)
