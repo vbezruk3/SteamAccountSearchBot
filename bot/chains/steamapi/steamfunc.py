@@ -50,32 +50,28 @@ async def getInf(id):
 
     level = ''
 
-    print(tables[lk:(lk+30)])
+    #print(tables[lk:(lk+30)])
 
-    while tables[lk + 12 + k] != '<':
-        level += tables[lk + 12 + k]
+    if 'Level <span>' in tables and '<' in tables[(lk + 12): (lk + 16)]:
+        while tables[lk + 12 + k] != '<':
+            level += tables[lk + 12 + k]
 
-        k += 1
-
-        if k > 3:
-            level = 'none'
-
-            break
+            k += 1
+    else:
+        level = 'none'
 
     rk = tables.find('"number" title="">')
     k = 0
 
     rank = ''
 
-    while tables[rk + 18 + k] != 'y' and tables[rk + 18 + k] != 'm':
-        rank += tables[rk + 18 + k]
+    if '"number" title="">' in tables and ('y' in tables[(rk + 18):(rk + 28)] or 'm' in tables[(rk + 18):(rk + 28)]):
+        while tables[rk + 18 + k] != 'y' and tables[rk + 18 + k] != 'm':
+            rank += tables[rk + 18 + k]
 
-        k += 1
-
-        if k > 3:
-            rank = 'none'
-
-            break
+            k += 1
+    else:
+        renk = 'none'
 
     ck = tables.find('flag-icon-') + 10
 
@@ -83,10 +79,13 @@ async def getInf(id):
 
     country = ''
 
-    while tables[ck + k] != '"':
-        country += tables[ck + k]
+    if 'flag-icon-' in tables and '"' in tables[ck:(ck+5)]:
+        while tables[ck + k] != '"':
+            country += tables[ck + k]
 
-        k += 1
+            k += 1
+    else:
+        county = 'none'
 
     if country not in countries:
         country = 'none'
@@ -187,3 +186,17 @@ async def getAll(url):
     inf.append(cost)
 
     return inf
+
+async def checkText(text):
+    for site in sites:
+        if site in text:
+            return True
+
+    return False
+
+async def getTypeSite(text):
+    for site in sites:
+        if site in text:
+            return site
+
+    return None

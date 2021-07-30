@@ -73,7 +73,14 @@ async def search(message: Message):
         ans_w = 'нет'
 
     answer = f'Бот работает: {ans_w}\n'
-    answer += f'Найдено профилей: {len(queuefunc.results[str(message.chat.id)])}'
+    answer += f'Найдено профилей (всего): {queuefunc.stats["sort_true"]}\n'
+    answer += f'Всего профилей: {int(queuefunc.stats["sort_false"]) + int(queuefunc.stats["sort_true"])}\n'
+    answer += f'Процент подходящих профилей: {float("{:.3f}".format((100 * float(queuefunc.stats["sort_true"]) / (float(queuefunc.stats["sort_false"]) +float(queuefunc.stats["sort_true"])))))}%\n'
+    answer += f'Найдено профилей: {len(queuefunc.results[str(message.chat.id)])}\n'
+
+    if str(message.from_user.id) == str(ADMIN_ID):
+        for id in queuefunc.results.keys():
+            answer += f'{id}: {len(queuefunc.results[str(id)])}\n'
 
     await bot.send_message(chat_id=message.from_user.id, text=answer)
 
@@ -84,30 +91,49 @@ async def search(message: Message):
 
     await bot.send_message(chat_id=message.from_user.id, text=queuefunc.getSettings(message.chat.id))
 
-async def getSteam(url):
+async def getSteam(url, type):
     driverforce.get(url)
 
     time.sleep(forcedrop_time)
 
     soup = BeautifulSoup(driverforce.page_source, features="html.parser")
 
-    try:
-        element = driverforce.find_element_by_class_name("profile-main__steam")
-    except:
-        return None
+    if type != 'easydrop':
+        try:
+            element = driverforce.find_element_by_class_name("profile-main__steam")
+        except:
+            return None
 
-    tables = str(soup.find_all('a', {'class': 'profile-main__steam'}))
+        tables = str(soup.find_all('a', {'class': 'profile-main__steam'}))
 
-    url = ''
+        url = ''
 
-    k = 0
+        k = 0
 
-    i = tables.find('href="') + 6
+        i = tables.find('href="') + 6
 
-    while tables[k + i] != '"':
-        url += tables[k + i]
+        while tables[k + i] != '"':
+            url += tables[k + i]
 
-        k += 1
+            k += 1
+    else:
+        try:
+            element = driverforce.find_element_by_class_name("user-stat.user-stat_steam")
+        except:
+            return None
+
+        tables = str(soup.find_all('a', {'class': 'user-stat user-stat_steam'}))
+
+        url = ''
+
+        k = 0
+
+        i = tables.find('href="') + 6
+
+        while tables[k + i] != '"':
+            url += tables[k + i]
+
+            k += 1
 
     return url
 
@@ -126,18 +152,20 @@ async def search(message: Message):
 
     i = 0
 
-    if 'forcedrop' in message.text:
+    if await steamfunc.checkText(message.text) == True:
         await bot.send_message(chat_id=message.chat.id, text='Профили добавляются')
         await bot.send_message(chat_id=ADMIN_ID, text=f'{message.chat.id}: Профили добавляются')
 
     for link in lines:
-        if 'forcedrop' in link:
-            i += 1
+        type = await steamfunc.getTypeSite(link)
 
-            url = await getSteam(link)
+        i += 1
+
+        if type != None:
+
+            url = await getSteam(link, type)
 
             if url != None:
-
 
                 flag = True
 

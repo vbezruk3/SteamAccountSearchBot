@@ -12,7 +12,11 @@ queue = {}
 
 chats_id = []
 
+sites = []
+
 settings = {}
+
+stats = {}
 
 results = {}
 
@@ -47,9 +51,9 @@ def check_sort(chat_id, data):
 
     cost = data[3]
 
-    print(cost)
+    #print(cost)
 
-    print(cost_intrvl)
+    #print(cost_intrvl)
 
     if not (county in setting["country"] or county == 'none'):
         return False
@@ -66,7 +70,7 @@ def check_sort(chat_id, data):
     return True
 
 def load():
-    global queue, chats_id, settings, results
+    global queue, chats_id, settings, results, sites, stats
 
     queue = files.loadFile(queue_dir)
 
@@ -75,6 +79,10 @@ def load():
     settings = files.loadFile(settings_dir)
 
     results = files.loadFile(results_dir)
+
+    sites = files.loadFile(sites_dir)
+
+    stats = files.loadFile(stats_dir)
 
 def getLink():
     if not queue["steam"]:
@@ -94,12 +102,15 @@ def removeLink():
 
 def addLink(url, link, chat_id):
 
-    queue['steam'].append(url)
-    queue['forcedrop'].append(link)
+    if link not in sites:
+        queue['steam'].append(url)
+        queue['forcedrop'].append(link)
 
-    chats_id.append(chat_id)
+        chats_id.append(chat_id)
 
-    save()
+        sites.append(link)
+
+        save()
 
     return
 
@@ -253,7 +264,7 @@ def addResult(chat_id, result, steam_url, forcedrop_url):
 
     #res = str(result[0]) + ' ' + str(result[1]) + ' ' + str(result[2]) + ' ' + str(result[3]) + ' ' + steam_url + ' ' + forcedrop_url
 
-    res = f'Steam: {steam_url}, Forcedrop: {forcedrop_url}, cena inventarya: {round(float(result[3]))}$, uroven: {result[0]}, let vislugi: {result[1]}, region: {result[2]}'
+    res = f'Steam: {steam_url}, Site: {forcedrop_url}, cena inventarya: {round(float(result[3]))}$, uroven: {result[0]}, let vislugi: {result[1]}, region: {result[2]}'
 
     results[str(chat_id)].append(res)
 
@@ -328,3 +339,8 @@ def save():
     files.saveFile(settings, settings_dir)
 
     files.saveFile(results, results_dir)
+
+    files.saveFile(sites, sites_dir)
+
+    files.saveFile(stats, stats_dir)
+

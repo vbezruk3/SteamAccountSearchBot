@@ -71,4 +71,10 @@ async def check():
                 await bot.send_message(chat_id=ADMIN_ID, text=f'{chat_id}: {ans}')
 
                 if c == True:
+                    queuefunc.stats['sort_true'] = int(queuefunc.stats['sort_true']) + 1
+
                     queuefunc.addResult(chat_id, data, url, forcedrop_link)
+                else:
+                    queuefunc.stats['sort_false'] = int(queuefunc.stats['sort_false']) + 1
+
+                queuefunc.save()

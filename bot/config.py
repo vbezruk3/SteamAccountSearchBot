@@ -18,6 +18,10 @@ settings_dir = './../data/sort_settings.json'
 
 results_dir = './../data/results.json'
 
+sites_dir = './../data/sites.json'
+
+stats_dir = './../data/stats.json'
+
 options = webdriver.ChromeOptions()
 
 prefs = {"profile.managed_default_content_settings.images": 2}
@@ -40,4 +44,4 @@ sleep_time2 = 3
 
 forcedrop_time = 3
 
-
+sites = ['mycsgoo', 'forcedrop', 'easydrop']

@@ -1,3 +1,4 @@
+import bot.chains.base.handlers
 from bot.core import *
 
 import time
